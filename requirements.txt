@@ -1,0 +1,5 @@
+bart==0.0.1
+numpy==1.6.2
+requests==0.14.2
+scipy==0.11.0
+-e git+https://github.com/astropy/astropy.git#egg=astropy-dev
