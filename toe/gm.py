@@ -13,11 +13,12 @@ G = si.G.to(u.R_sun ** 3 / (u.M_sun * u.hour ** 2)).value
 ldp = QuadraticLimbDarkening(10, 0.39, 0.1)
 
 
-def get_period(star, planet):
-    return 2 * np.pi * np.sqrt(planet.a ** 2 / G / star.mass)
+def get_period(planet):
+    return 2 * np.pi * np.sqrt(planet.a ** 2 / G / planet.star.mass)
 
 
-def get_duration(star, planet):
+def get_duration(planet):
+    star = planet.star
     i = np.abs(star.inclination + planet.di)
     T = get_period(star, planet)
     b = planet.a / star.radius / np.tan(i)
@@ -26,7 +27,8 @@ def get_duration(star, planet):
             oneplusk * oneplusk - b * b) / np.sin(i)) / np.pi
 
 
-def get_depth(star, planet):
+def get_depth(planet):
+    star = planet.star
     b = planet.a / star.radius / np.tan(np.abs(star.inclination + planet.di))
     return _bart.ldlc(planet.r / star.radius, ldp.bins, ldp.intensity, b)
 
@@ -80,7 +82,11 @@ class Star(object):
 
 class Planet(object):
 
-    def __init__(self, r, a, di):
+    def __init__(self, r, a, di, star):
         self.r = r
         self.a = a
         self.di = di
+        self.star = star
+
+
+
