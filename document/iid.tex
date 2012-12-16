@@ -1,0 +1,95 @@
+\documentclass[12pt, preprint]{aastex}
+
+\newcommand{\documentname}{\textsl{Note}}
+
+\renewcommand{\d}{\mathrm{d}}
+
+\begin{document}
+
+\title{IID: How is the architecture of exoplanetary systems inconsistent with statistical independence?}
+\author{
+  some combination of:
+  Daniel~Foreman-Mackey\altaffilmark{1, 2},
+  Patrick Cooper\altaffilmark{1},
+  Ross~Fadely\altaffilmark{1},
+  David~W.~Hogg\altaffilmark{1}
+  Meg~Schwamb\altaffilmark{3},
+  Julian~Taub\altaffilmark{4}
+}
+\altaffiltext{1}{Center for Cosmology and Particle Physics, New York University}
+\altaffiltext{2}{to whom correspondence should be addressed}
+\altaffiltext{3}{Department of Astronomy, Yale University}
+\altaffiltext{4}{Freelance!}
+
+\begin{abstract}
+  The mass, chemical composition, and age of a star are all
+  undoubtedly related to the probability that the star will host an
+  exoplanetary system, and exoplanets within a single extrasolar
+  system must interact gravitationally.  Nonetheless, in this
+  \documentname\ we consider a trivial model for exoplanetary systems
+  in which exoplanets are assigned to stars \emph{independently}, with
+  no regard to stellar properties or the exisitence or properties of
+  other exoplanets in the system.  Although there is freedom in choice
+  of quantities to be considered ``independent'', we find that the
+  model is not a good fit to the data for any simple choices.  In
+  particular the independence asumption is violated in the following
+  respects: blah, blah blah.
+\end{abstract}
+
+\keywords{
+  methods: statistical
+  ---
+  celestial mechanics
+  ---
+  planetary systems
+  ---
+  planets and satellites: dynamical evolution and stability
+  ---
+  planets and satellites: fundamental parameters
+  ---
+  surveys
+}
+
+\section{Introduction}
+
+...Independence; why it cannot be true.  Why it is interesting to study....
+
+...Here are things that \emph{are} known about the exoplanet population:
+\begin{itemize}
+\item
+Accounting for selection effects, the distribution of transiting
+planet radii $R_p$ seems to be $\d N / \d\ln R_p\propto R^{-2}$,
+or $\d N/ \d R_p\propto R^{-3}$ (\citealt{howard}, \citealt{youdin}).
+\item
+The distribution of multi-planet transit systems with planet periods
+less than 200~d is best explained by a small but finite inclination
+distribution.  The best-fit inclination distributions have scatters of
+1 to 3~deg, suggesting strong but not exact coplanarity, and mirroring
+our own solar system (\citealt{fang}).
+\end{itemize}
+
+\section{Causal model}
+
+Overall, the model is...
+
+Specifically, we model...  
+
+\section{Data and results}
+
+\section{Discussion}
+
+\acknowledgements Big thanks to Gus Muench (CfA) who organized the
+dotastronomy NYC Hack Day on 2012 December 15, where this project was
+started.  It is a pleasure to also thank....and acknowledge....etc.
+
+\begin{thebibliography}{70}
+\raggedright
+\bibitem[Fang \& Margot(2012)]{fang}
+Fang, J., \& Margot, J.-L.\ 2012, \apj, 761, 92
+\bibitem[Howard et al.(2012)]{howard}
+Howard, A.~W., Marcy, G.~W., Bryson, S.~T., et al.\ 2012, \apjs, 201, 15
+\bibitem[Youdin(2011)]{youdin}
+Youdin, A.~N.\ 2011, \apj, 742, 38
+\end{thebibliography}
+
+\end{document}
