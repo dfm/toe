@@ -12,19 +12,7 @@ def get_candidates():
     if r.status_code != requests.codes.ok:
         r.raise_for_status()
 
-    candidates = r.json
-    for i in range(len(candidates)):
-        print(float(i) / len(candidates))
-        star = get_star(candidates[i][u"Kepler ID"])[0]
-        logg = star[u"Log G (cm/s/s)"]
-        if len(logg) == 0:
-            continue
-        g = 10 ** (float(logg) - 2)
-        r = float(star[u"Radius (solar=1.0)"]) * si.R_sun.value
-        candidates[i][u"Star Mass"] = g * r * r / si.G.value / si.M_sun.value
-        candidates[i][u"Star Radius"] = float(star[u"Radius (solar=1.0)"])
-
-    return candidates
+    return r.json
 
 
 def get_star(sid):
