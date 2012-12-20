@@ -1,6 +1,9 @@
 from __future__ import print_function
 
+import json
+
 import numpy as np
+import scipy.optimize as op
 import astropy.units as u
 from astropy.constants import si
 from bart import _bart, QuadraticLimbDarkening
@@ -58,10 +61,10 @@ class SelectionFunction(object):
 
 class Star(object):
 
-    def __init__(self, flux, radius, mass, logg, inclination):
+    def __init__(self, flux, radius, logg, inclination):
         self.flux = flux
         self.radius = radius
-        self.mass = mass
+        self.logg = logg
         self.inclination = inclination
 
     @property
@@ -86,7 +89,7 @@ class Planet(object):
     @property
     def duration(self):
         star = self.star
-        i = np.abs(star.inclination + self.di)
+        i = star.inclination + self.di
         T = self.period
         b = self.a / star.radius / np.tan(i)
         oneplusk = 1 + self.r / star.radius
@@ -102,24 +105,28 @@ class Planet(object):
 
 class TransitFit(object):
 
-    def __init__(self, selection, a_prior, di_prior, star, dt_data, df_data):
+    def __init__(self, selection, a_prior, di_prior, data):
         self.selection = selection
         self.a_prior = a_prior
         self.di_prior = di_prior
-        self.star = star
-        self.dt_data = dt_data
-        self.df_data = df_data
+        self.data = data
+        self.star = data.star
 
     def __call__(self, p):
-        r, a, di = p
+        r, a = np.exp(p[:2])
+        di = p[2]
         planet = Planet(r, a, di, self.star)
 
         dt, df = planet.duration, planet.depth * self.star.flux
-        s = self.selection(dt, df)
+        s = self.selection(self.star.inclination + di, dt, df)
         if s == 0:
             return -np.inf
 
-        ap = self.a_prior(self.a)
+        rp = self.r_prior(p[0])
+        if np.isinf(rp):
+            return -np.inf
+
+        ap = self.a_prior(p[1])
         if np.isinf(ap):
             return -np.inf
 
@@ -127,10 +134,49 @@ class TransitFit(object):
         if np.isinf(ip):
             return -np.inf
 
-        lnlike = -0.5 * (self.dt_data[0] - dt) ** 2 * self.dt_data[1]
-        lnlike += -0.5 * (self.df_data[0] - df) ** 2 * self.df_data[1]
+        lnlike = -0.5 * (self.data.dt[0] - dt) ** 2 * self.data.dt[1]
+        lnlike += -0.5 * (self.data.df[0] - df) ** 2 * self.data.df[1]
 
-        return lnlike + np.log(s) + ap + ip
+        return lnlike + np.log(s) + rp + ap + ip
 
     def sample(self):
-        pass
+        r0 = self.star.radius * np.sqrt(1 - self.df_data[0] / self.star.flux)
+        a0 = self.T_data[0] * (r0 + self.star.radius) / np.pi / self.dt_data[0]
+        di0 = 0.0
+
+        p0 = [np.log(r0), np.log(a0), di0]
+        chi2 = lambda p: -2 * self(p)
+        result = op.minimize(chi2, p0)
+        print(result.x)
+
+
+class KOI(object):
+
+    def __init__(self, doc):
+        self._doc = doc
+
+        if u"log(g)" not in doc or float(doc[u"Period"]) < 0:
+            self.ok = False
+            return
+
+        self.ok = True
+
+        self.period = (float(doc[u"Period"]), float(doc[u"e_Period"]))
+        self.flux = 10 ** (-0.4 * float(doc[u"Kepmag"]))
+        self.star = Star(self.flux, float(doc[u"Star Radius"]),
+                         float(doc[u"log(g)"]), 0.5 * np.pi)
+        self.df = (float(doc[u"Depth"]),
+
+    def __repr__(self):
+        return repr(self._doc)
+
+
+def load_kois(fn):
+    docs = json.load(open(fn, u"r"))
+    kois = [KOI(d) for d in docs]
+    return [k for k in kois if k.ok]
+
+
+if __name__ == "__main__":
+    kois = load_kois(u"data/koi.json")
+    print(kois[6])
